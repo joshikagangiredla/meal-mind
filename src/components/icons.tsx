@@ -115,7 +115,14 @@ export function CheckIco() {
 }
 
 /** Grocery bag with a carrot poking out of the top. */
-export function GroceryBagIco({ size = 26, color = '#4A5D3F' }: { size?: number; color?: string }) {
+export function GroceryBagIco({ size = 26, color = '#4A5D3F', bagFill = '#F3E9D8', rimColor }: {
+  size?: number;
+  /** Outline colour. */
+  color?: string;
+  bagFill?: string;
+  /** Colour of the folded-rim line across the bag (defaults to the outline colour). */
+  rimColor?: string;
+}) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden>
       {/* carrot: thick end + leaves sticking out top-right, tip hidden in the bag */}
@@ -128,9 +135,9 @@ export function GroceryBagIco({ size = 26, color = '#4A5D3F' }: { size?: number;
       <path d="M9.6 14V11.4a2.6 2.6 0 0 1 5.2 0V14" stroke={color} strokeWidth="1.7" strokeLinecap="round" />
       {/* paper bag */}
       <path d="M5.5 14h21l-1.4 13.2a2.2 2.2 0 0 1-2.2 1.9H9.1a2.2 2.2 0 0 1-2.2-1.9L5.5 14z"
-        fill="#F3E9D8" stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
+        fill={bagFill} stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
       {/* folded rim */}
-      <path d="M5.9 17.3h20.2" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M5.9 17.3h20.2" stroke={rimColor ?? color} strokeWidth="1.4" strokeLinecap="round" />
     </svg>
   );
 }
