@@ -44,7 +44,7 @@ export default function PlannerScreen({
               aria-label={`Grocery list${groceryCount ? `, ${groceryCount} items to buy` : ''}`}
               className="relative w-11 h-11 -mr-1 rounded-2xl bg-olive shadow-sm flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform"
             >
-              <GroceryBagIco size={28} color="#FBF8F3" bagFill="#F3E9D8" rimColor="#4A5D3F" />
+              <GroceryBagIco size={30} color="#4A5D3F" bagFill="#F3E9D8" handleColor="#F3E9D8" leafFill="#B9D08C" leafStroke="#B9D08C" />
               {groceryCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full bg-[#E07B39] text-white text-[10px] font-bold flex items-center justify-center border-2 border-cream">
                   {groceryCount > 99 ? '99+' : groceryCount}
