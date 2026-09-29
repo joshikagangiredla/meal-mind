@@ -48,8 +48,8 @@ export default function HomeScreen({ recipes, loading, error, source, onRetry, o
         <div className="absolute top-10 left-6">
           <Logo color="white" />
         </div>
-        <div className="absolute top-9 right-6 max-w-[160px] text-right">
-          <p className="text-white text-[18px] font-bold leading-tight whitespace-pre-line">
+        <div className="absolute top-[52px] right-6 max-w-[210px] text-right">
+          <p className="text-white text-[23px] font-bold leading-[1.15] drop-shadow-sm whitespace-pre-line">
             {HERO_HEADLINES[slide % HERO_HEADLINES.length]}
           </p>
         </div>
