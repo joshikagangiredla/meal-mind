@@ -45,7 +45,7 @@ export default function HomeScreen({ recipes, loading, error, source, onRetry, o
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80" />
-        <div className="absolute top-10 left-6">
+        <div className="absolute top-[54px] left-6">
           <Logo color="white" />
         </div>
         <div className="absolute top-[52px] right-6 max-w-[210px] text-right">
