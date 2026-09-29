@@ -4,6 +4,8 @@ A meal planning app that helps you plan your food in advance, so you don't have 
 
 Browse recipes, save the ones you like, and drop them into a weekly Breakfast / Lunch / Dinner plan.
 
+**Live demo:** https://joshikagangiredla.github.io/meal-mind/
+
 ## Features
 
 - **Home**: rotating hero of recommended recipes, Quick Picks, and categories
