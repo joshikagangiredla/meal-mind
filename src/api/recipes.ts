@@ -1,4 +1,5 @@
 import type { Category, Ingredient, Recipe } from '../types';
+import { formatAmount } from '../lib/grocery';
 
 /**
  * Recipe service. Tries Spoonacular first (through our /api/recipes function,
@@ -25,6 +26,29 @@ export async function loadRecipes(q: RecipeQuery = {}): Promise<RecipeResult> {
     console.info('[Meal Mind] Spoonacular unavailable, using TheMealDB:', (err as Error).message);
     return { recipes: await fromMealDB(q), source: 'mealdb' };
   }
+}
+
+/**
+ * Full details for recipes we only know by id/name/photo (restored after a
+ * refresh). Returns whatever it could load; missing ones are simply left out.
+ */
+export async function loadRecipeDetails(ids: string[]): Promise<Recipe[]> {
+  const sp = ids.filter(id => id.startsWith('sp-')).map(id => id.slice(3));
+  const mdb = ids.filter(id => id.startsWith('mdb-')).map(id => id.slice(4));
+  const out: Recipe[] = [];
+
+  if (sp.length) {
+    try {
+      const res = await fetch(`/api/recipes?ids=${sp.join(',')}`);
+      const data = res.ok && res.headers.get('content-type')?.includes('application/json') ? await res.json() : null;
+      if (Array.isArray(data)) out.push(...data.map(normalizeSpoonacular));
+    } catch {
+      /* leave as stubs */
+    }
+  }
+  const meals = await Promise.all(mdb.map(lookupMealDB));
+  out.push(...meals.filter(Boolean).map(normalizeMealDB));
+  return out;
 }
 
 // ── Spoonacular ─────────────────────────────────────────
@@ -89,11 +113,16 @@ function toIngredient(i: any): Ingredient {
   const isServing = /^servings?$/i.test(rawUnit);
   const amount = typeof i.amount === 'number' && !isServing ? formatAmount(i.amount) : '';
   const unit = isServing ? '' : shortUnit(rawUnit, i.amount);
-  return { qty: [amount, unit].filter(Boolean).join(' '), name: capitalize(String(i.name ?? i.original ?? '').trim()) };
+  return {
+    qty: [amount, unit].filter(Boolean).join(' '),
+    name: capitalize(String(i.name ?? i.original ?? '').trim()),
+    amount: typeof i.amount === 'number' && !isServing ? i.amount : undefined,
+    unit: unit || undefined,
+  };
 }
 
 const UNIT_ALIASES: Record<string, string> = {
-  tablespoon: 'tbsp', tablespoons: 'tbsp', tbsp: 'tbsp', tbsps: 'tbsp', tbs: 'tbsp', t: 'tbsp',
+  tablespoon: 'tbsp', tablespoons: 'tbsp', tbsp: 'tbsp', tbsps: 'tbsp', tbs: 'tbsp',
   teaspoon: 'tsp', teaspoons: 'tsp', tsp: 'tsp', tsps: 'tsp',
   ounce: 'oz', ounces: 'oz', oz: 'oz',
   pound: 'lb', pounds: 'lb', lb: 'lb', lbs: 'lb',
@@ -196,15 +225,6 @@ function firstSentences(text: string, max: number) {
   const cut = clean.slice(0, max);
   const end = cut.lastIndexOf('. ');
   return end > 40 ? cut.slice(0, end + 1) : cut.replace(/\s+\S*$/, '') + '…';
-}
-
-function formatAmount(n: number) {
-  if (Number.isInteger(n)) return String(n);
-  const fractions: [number, string][] = [[0.25, '¼'], [0.33, '⅓'], [0.5, '½'], [0.67, '⅔'], [0.75, '¾']];
-  const whole = Math.floor(n);
-  const frac = fractions.find(([v]) => Math.abs(n - whole - v) < 0.04);
-  if (frac) return `${whole || ''}${frac[1]}`;
-  return String(Math.round(n * 100) / 100);
 }
 
 function dedupeIngredients(list: Ingredient[]) {

@@ -1,67 +1,95 @@
+import { useState } from 'react';
 import { StatusBarSpacer } from '../components/StatusBar';
 import PageHeader from '../components/PageHeader';
-import { ChevronRIco } from '../components/icons';
 
-export default function ProfileScreen({ savedCount, mealsPlanned }: { savedCount: number; mealsPlanned: number }) {
-  const settings = [
-    { label: 'Dietary preferences', value: 'No restrictions' },
-    { label: 'Allergies', value: 'None set' },
-    { label: 'Household size', value: '2 people' },
-    { label: 'Notifications', value: 'Enabled' },
-    { label: 'About', value: 'v1.4.2' },
-  ];
+export default function ProfileScreen({ name, onNameChange, savedCount, mealsPlanned, weeksPlanned, onResetAll }: {
+  name: string;
+  onNameChange: (name: string) => void;
+  savedCount: number;
+  mealsPlanned: number;
+  weeksPlanned: number;
+  onResetAll: () => void;
+}) {
+  const [editing, setEditing] = useState(!name);
+  const [draft, setDraft] = useState(name);
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  function saveName() {
+    onNameChange(draft.trim());
+    setEditing(false);
+  }
+
+  const initial = name.trim()[0]?.toUpperCase();
 
   return (
-    <div className="bg-[#FBF8F3] min-h-full">
+    <div className="bg-cream min-h-full">
       <StatusBarSpacer />
-      <div className="pb-32">
-        {/* Profile header */}
-        <div className="px-6 pt-3 pb-6">
-          <PageHeader title="Profile" />
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-[#4A5D3F] flex items-center justify-center text-white text-[24px] font-bold shadow-md">
-              S
-            </div>
-            <div>
-              <p className="text-[18px] font-bold text-[#1E1E1E]">Sarah Kim</p>
-              <p className="text-[13px] text-[#6B6B6B]">sarah.kim@email.com</p>
-            </div>
-          </div>
+      <div className="px-6 pt-3 pb-32">
+        <PageHeader title="Profile" />
 
-          {/* Stats */}
-          <div className="flex gap-3 mt-5">
-            {[
-              { label: 'Recipes Saved', value: String(savedCount) },
-              { label: 'Meals Planned', value: String(mealsPlanned) },
-              { label: 'Weeks Planned', value: '12' },
-            ].map(stat => (
-              <div key={stat.label} className="flex-1 bg-white rounded-2xl px-3 py-3.5 text-center border border-[#F0ECE5] shadow-sm">
-                <p className="text-[20px] font-bold text-[#4A5D3F]">{stat.value}</p>
-                <p className="text-[10px] text-[#6B6B6B] mt-0.5 leading-tight">{stat.label}</p>
-              </div>
-            ))}
+        {/* Who's cooking */}
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-olive flex items-center justify-center text-white text-[24px] font-bold shadow-md flex-shrink-0">
+            {initial ?? (
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" /></svg>
+            )}
           </div>
+          {editing ? (
+            <form className="flex-1 min-w-0 flex gap-2" onSubmit={e => { e.preventDefault(); saveName(); }}>
+              <input
+                autoFocus
+                value={draft}
+                onChange={e => setDraft(e.target.value)}
+                maxLength={30}
+                placeholder="Your name"
+                className="flex-1 min-w-0 bg-white border border-line rounded-xl px-3 py-2 text-[15px] text-ink outline-none focus:border-olive"
+              />
+              <button type="submit" className="px-4 rounded-xl bg-olive text-white text-[13px] font-semibold">Save</button>
+            </form>
+          ) : (
+            <div className="flex-1 min-w-0">
+              <p className="text-[18px] font-bold text-ink truncate">{name ? `Hi, ${name}` : 'Hi there'}</p>
+              <button onClick={() => { setDraft(name); setEditing(true); }} className="text-[13px] text-olive font-semibold">
+                Edit name
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Settings */}
-        <div className="px-6">
-          <p className="text-[13px] font-semibold text-[#6B6B6B] mb-3 uppercase tracking-wide">Settings</p>
-          <div className="bg-white rounded-2xl border border-[#F0ECE5] overflow-hidden shadow-sm">
-            {settings.map((s, i) => (
-              <div key={s.label} className={`flex items-center justify-between px-4 py-3.5 ${i < settings.length - 1 ? 'border-b border-[#F4F1EC]' : ''}`}>
-                <span className="text-[14px] text-[#1E1E1E] font-medium">{s.label}</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-[12px] text-[#6B6B6B]">{s.value}</span>
-                  <ChevronRIco />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <button className="mt-5 w-full border border-red-200 text-red-500 text-[14px] font-semibold py-3.5 rounded-full">
-            Sign Out
-          </button>
+        {/* Stats, all counted from what's saved on this device */}
+        <div className="flex gap-3 mt-5">
+          {[
+            { label: 'Recipes Saved', value: savedCount },
+            { label: 'Meals Planned', value: mealsPlanned },
+            { label: 'Weeks Planned', value: weeksPlanned },
+          ].map(stat => (
+            <div key={stat.label} className="flex-1 bg-white rounded-2xl px-3 py-3.5 text-center border border-line shadow-sm">
+              <p className="text-[20px] font-bold text-olive">{stat.value}</p>
+              <p className="text-[10px] text-muted mt-0.5 leading-tight">{stat.label}</p>
+            </div>
+          ))}
         </div>
+
+        {/* About */}
+        <p className="text-[13px] font-semibold text-muted mt-8 mb-3 uppercase tracking-wide">About</p>
+        <div className="bg-white rounded-2xl border border-line shadow-sm px-4 py-3.5 text-[13px] text-ink leading-relaxed">
+          Meal Mind helps you plan your meals in advance so you don't have to decide what to cook every day.
+          <span className="block text-[12px] text-muted mt-2">
+            Your saved recipes, meal plan and grocery list are stored on this device only. Recipes powered by{' '}
+            <a className="underline" href="https://spoonacular.com/food-api" target="_blank" rel="noreferrer">spoonacular</a> and{' '}
+            <a className="underline" href="https://www.themealdb.com" target="_blank" rel="noreferrer">TheMealDB</a>.
+          </span>
+        </div>
+
+        <button
+          onClick={() => {
+            if (confirmReset) { onResetAll(); setConfirmReset(false); } else setConfirmReset(true);
+          }}
+          onBlur={() => setConfirmReset(false)}
+          className={`mt-5 w-full border text-[14px] font-semibold py-3.5 rounded-full transition-colors ${confirmReset ? 'bg-red-500 border-red-500 text-white' : 'border-red-200 text-red-500'}`}
+        >
+          {confirmReset ? 'Tap again to erase everything' : 'Reset all data'}
+        </button>
       </div>
     </div>
   );

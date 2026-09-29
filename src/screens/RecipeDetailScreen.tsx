@@ -3,8 +3,8 @@ import { capitalize } from '../api/recipes';
 import type { Recipe } from '../types';
 import { BackIco, CheckIco, ClockIco, FlameIco, PersonsIco } from '../components/icons';
 
-export default function RecipeDetailScreen({ recipe, onBack, saved, onToggleSave, onAddToPlan }: {
-  recipe: Recipe; onBack: () => void; saved: boolean;
+export default function RecipeDetailScreen({ recipe, status = 'idle', onBack, saved, onToggleSave, onAddToPlan }: {
+  recipe: Recipe; status?: 'idle' | 'loading' | 'error'; onBack: () => void; saved: boolean;
   onToggleSave: () => void; onAddToPlan: () => void;
 }) {
   const [tab, setTab] = useState<'ingredients' | 'instructions'>('ingredients');
@@ -56,8 +56,21 @@ export default function RecipeDetailScreen({ recipe, onBack, saved, onToggleSave
       {/* Content */}
       <div className="px-6 pt-5 pb-4">
         <h1 className="text-[22px] font-bold text-[#1E1E1E] leading-tight">{recipe.name}</h1>
-        <p className="text-[13px] text-[#6B6B6B] mt-1.5 leading-relaxed">{recipe.desc}</p>
+        {recipe.desc && <p className="text-[13px] text-[#6B6B6B] mt-1.5 leading-relaxed">{recipe.desc}</p>}
 
+        {recipe.stub ? (
+          status === 'error' ? (
+            <p className="mt-6 text-[13px] text-muted">
+              Couldn't load this recipe's details right now. It's still in your plan; try again later.
+            </p>
+          ) : (
+            <div className="mt-5 space-y-3 animate-pulse" aria-label="Loading recipe">
+              <div className="h-[74px] rounded-2xl bg-[#ECE7DF]" />
+              <div className="h-10 rounded-full bg-[#ECE7DF]" />
+              {Array.from({ length: 5 }, (_, i) => <div key={i} className="h-5 rounded bg-[#ECE7DF]" />)}
+            </div>
+          )
+        ) : (<>
         {/* Stats: Spoonacular gives time/servings/calories; TheMealDB gives cuisine/category. */}
         {stats.length > 0 && (
           <div className="flex gap-4 mt-4 bg-white rounded-2xl px-5 py-3.5 shadow-sm border border-line">
@@ -133,6 +146,7 @@ export default function RecipeDetailScreen({ recipe, onBack, saved, onToggleSave
             View original recipe
           </a>
         )}
+        </>)}
       </div>
 
       {/* Sticky add button (pinned to the phone frame, not the scroll area) */}

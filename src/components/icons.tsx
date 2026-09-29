@@ -113,3 +113,24 @@ export function CheckIco() {
     </svg>
   );
 }
+
+/** Grocery bag with a carrot poking out of the top. */
+export function GroceryBagIco({ size = 26, color = '#4A5D3F' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden>
+      {/* carrot: thick end + leaves sticking out top-right, tip hidden in the bag */}
+      <path d="M13.5 17.5 21.2 7.3c.8-1 2.3-1.1 3.2-.2.9.9.8 2.4-.2 3.2L14.9 18.9z"
+        fill="#E07B39" stroke={color} strokeWidth="1.4" strokeLinejoin="round" />
+      <path d="M18.4 11.6l1.2.9M16.6 14l1.1.8" stroke={color} strokeWidth="1.1" strokeLinecap="round" />
+      <path d="M23.9 6.6c.2-1.9 1.3-3.3 3-3.8.1 1.8-.9 3.3-2.5 4M24.9 8.2c1.6-.9 3.4-.8 4.6.3-1.2 1-2.9 1.2-4.4.6M23 6.2c-.8-1.6-.6-3.4.5-4.6.9 1.3.9 3 0 4.4"
+        fill="#8BA36B" stroke={color} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+      {/* handles */}
+      <path d="M9.6 14V11.4a2.6 2.6 0 0 1 5.2 0V14" stroke={color} strokeWidth="1.7" strokeLinecap="round" />
+      {/* paper bag */}
+      <path d="M5.5 14h21l-1.4 13.2a2.2 2.2 0 0 1-2.2 1.9H9.1a2.2 2.2 0 0 1-2.2-1.9L5.5 14z"
+        fill="#F3E9D8" stroke={color} strokeWidth="1.8" strokeLinejoin="round" />
+      {/* folded rim */}
+      <path d="M5.9 17.3h20.2" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}

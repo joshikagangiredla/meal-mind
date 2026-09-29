@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import type { MealSlot, Recipe } from '../types';
-import { DAYS } from '../data/constants';
 import { loadRecipes, recipeMeta } from '../api/recipes';
 import { PlusIco } from './icons';
 
@@ -8,8 +7,8 @@ import { PlusIco } from './icons';
  * Bottom sheet for adding a recipe to a day/slot. Lists recipes already loaded
  * in the app (with the one you came from pinned first); searching loads more.
  */
-export default function AddMealSheet({ day, slot, recipes, highlightId, onLoaded, onClose, onAdd }: {
-  day: number; slot: MealSlot | null; recipes: Recipe[]; highlightId?: string | null;
+export default function AddMealSheet({ dayLabel, slot, recipes, highlightId, onLoaded, onClose, onAdd }: {
+  dayLabel: string; slot: MealSlot | null; recipes: Recipe[]; highlightId?: string | null;
   onLoaded: (recipes: Recipe[]) => void;
   onClose: () => void; onAdd: (recipeId: string, slot: MealSlot) => void;
 }) {
@@ -35,7 +34,7 @@ export default function AddMealSheet({ day, slot, recipes, highlightId, onLoaded
     }
   }
 
-  const list = (results ?? recipes)
+  const list = (results ?? recipes.filter(r => !r.stub || r.id === highlightId))
     .slice()
     .sort((a, b) => (a.id === highlightId ? -1 : b.id === highlightId ? 1 : 0));
 
@@ -48,7 +47,7 @@ export default function AddMealSheet({ day, slot, recipes, highlightId, onLoaded
         </div>
         <div className="px-6 pb-3">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-[18px] font-bold text-ink">Add to {DAYS[day]}</h2>
+            <h2 className="text-[18px] font-bold text-ink">Add to {dayLabel}</h2>
             <button onClick={onClose} aria-label="Close" className="w-7 h-7 rounded-full bg-line flex items-center justify-center">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B6B6B" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
             </button>

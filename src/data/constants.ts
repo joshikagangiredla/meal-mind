@@ -15,6 +15,4 @@ export const CATEGORIES: Category[] = [
 
 export const HERO_HEADLINES = ["Recipes we\nthink you'd like", 'Trending\nthis week', 'Something\nnew to try'];
 
-export const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-export const DATES = [28, 29, 30, 1, 2, 3, 4];
 export const POPULAR_TAGS = ['Pasta', 'Chicken', 'Soup', 'Tacos', 'Salmon', 'Curry'];

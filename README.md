@@ -11,9 +11,11 @@ Browse recipes, save the ones you like, and drop them into a weekly Breakfast / 
 - **Home**: rotating hero of recommended recipes, Quick Picks, and categories
 - **Search**: search by name or category, with popular search tags
 - **Recipe detail**: ingredients checklist, step-by-step instructions, and "Add to Meal Plan"
-- **Meal Planner**: week view with a day strip; add, open, or remove meals per slot
+- **Meal Planner**: real calendar weeks with today highlighted; add, open, or remove meals per slot
+- **Grocery list**: combines the week's planned meals into one list (same ingredients are added up); open it from the grocery-bag button in the Planner
 - **Saved**: saved recipes, filterable by category
-- **Profile**: stats and settings
+- **Profile**: your name and stats counted from what you've saved and planned
+- Saved recipes, meal plans, grocery list and name are remembered on your device (localStorage). For spoonacular recipes only the id, title and image are stored, as their terms require; details are fetched again when opened
 - A frosted bottom nav whose highlight slides between tabs
 
 ## Recipe data
@@ -47,7 +49,8 @@ src/
   App.tsx              app state and navigation
   api/recipes.ts       loads recipes (spoonacular, then TheMealDB fallback)
   types.ts             shared types
-  data/constants.ts    categories, days, popular searches
+  data/constants.ts    categories and popular searches
+  lib/                 dates, grocery list merging, local storage
   components/          nav, cards, header, icons, add-meal sheet
   screens/             one file per screen
 ```
