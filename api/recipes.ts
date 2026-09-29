@@ -15,7 +15,8 @@
 const BASE = 'https://api.spoonacular.com/recipes/complexSearch';
 
 export async function GET(request: Request): Promise<Response> {
-  const key = process.env.SPOONACULAR_API_KEY;
+  // Trim in case the key was pasted with spaces, a line break, or quotes.
+  const key = process.env.SPOONACULAR_API_KEY?.trim().replace(/^["']|["']$/g, '');
   if (!key) return json({ error: 'SPOONACULAR_API_KEY is not set' }, 500);
 
   const params = new URL(request.url).searchParams;
