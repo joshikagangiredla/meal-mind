@@ -4,6 +4,8 @@ A meal planning app that helps you plan your food in advance, so you don't have 
 
 Browse recipes, save the ones you like, and drop them into a weekly Breakfast / Lunch / Dinner plan.
 
+**Try it live:** https://meal-mind-virid.vercel.app
+
 ## Features
 
 - **Home**: rotating hero of recommended recipes, Quick Picks, and categories
