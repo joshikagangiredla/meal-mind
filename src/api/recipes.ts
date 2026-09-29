@@ -79,8 +79,32 @@ function normalizeSpoonacular(r: any): Recipe {
 }
 
 function toIngredient(i: any): Ingredient {
-  const amount = typeof i.amount === 'number' ? formatAmount(i.amount) : '';
-  return { qty: [amount, i.unit].filter(Boolean).join(' '), name: i.name ?? i.original ?? '' };
+  const rawUnit = String(i.unit ?? '').trim();
+  // Spoonacular uses "serving(s)" for garnishes like avocado; that isn't a real measurement.
+  const isServing = /^servings?$/i.test(rawUnit);
+  const amount = typeof i.amount === 'number' && !isServing ? formatAmount(i.amount) : '';
+  const unit = isServing ? '' : shortUnit(rawUnit, i.amount);
+  return { qty: [amount, unit].filter(Boolean).join(' '), name: capitalize(String(i.name ?? i.original ?? '').trim()) };
+}
+
+const UNIT_ALIASES: Record<string, string> = {
+  tablespoon: 'tbsp', tablespoons: 'tbsp', tbsp: 'tbsp', tbsps: 'tbsp', tbs: 'tbsp', t: 'tbsp',
+  teaspoon: 'tsp', teaspoons: 'tsp', tsp: 'tsp', tsps: 'tsp',
+  ounce: 'oz', ounces: 'oz', oz: 'oz',
+  pound: 'lb', pounds: 'lb', lb: 'lb', lbs: 'lb',
+  gram: 'g', grams: 'g', g: 'g', kilogram: 'kg', kilograms: 'kg', kg: 'kg',
+  milliliter: 'ml', milliliters: 'ml', ml: 'ml', liter: 'l', liters: 'l', l: 'l',
+  cup: 'cup', cups: 'cup', c: 'cup',
+  quart: 'qt', quarts: 'qt', pint: 'pt', pints: 'pt',
+  'fluid ounce': 'fl oz', 'fluid ounces': 'fl oz', 'fl. oz': 'fl oz',
+};
+
+/** "Tablespoons" → "tbsp", "cups" → "cups"/"cup"; leaves words like "cloves" or "large" alone. */
+function shortUnit(unit: string, amount: unknown) {
+  if (!unit) return '';
+  const short = UNIT_ALIASES[unit.toLowerCase()];
+  if (!short) return unit.toLowerCase();
+  return short === 'cup' && typeof amount === 'number' && amount > 1 ? 'cups' : short;
 }
 
 // ── TheMealDB (fallback) ────────────────────────────────

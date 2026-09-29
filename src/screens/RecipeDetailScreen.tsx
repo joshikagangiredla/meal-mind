@@ -92,16 +92,27 @@ export default function RecipeDetailScreen({ recipe, onBack, saved, onToggleSave
         </div>
 
         {tab === 'ingredients' ? (
-          <div className="mt-4 space-y-3">
-            {recipe.ingredients.map((ing, i) => (
-              <div key={i} className="flex items-center gap-3" onClick={() => toggleCheck(i)}>
-                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 cursor-pointer transition-all ${checked.has(i) ? 'bg-[#4A5D3F] border-[#4A5D3F]' : 'border-[#D1CCC6]'}`}>
-                  {checked.has(i) && <CheckIco />}
-                </div>
-                <span className={`text-[13px] text-[#6B6B6B] font-medium w-14 flex-shrink-0 ${checked.has(i) ? 'line-through opacity-50' : ''}`}>{ing.qty}</span>
-                <span className={`text-[13px] text-[#1E1E1E] flex-1 ${checked.has(i) ? 'line-through opacity-50' : ''}`}>{ing.name}</span>
-              </div>
-            ))}
+          <div className="mt-3">
+            {recipe.ingredients.map((ing, i) => {
+              const done = checked.has(i);
+              return (
+                <button
+                  key={i}
+                  onClick={() => toggleCheck(i)}
+                  className="w-full flex items-center gap-3 py-2.5 border-b border-line last:border-0 text-left"
+                >
+                  <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${done ? 'bg-olive border-olive' : 'border-[#D1CCC6]'}`}>
+                    {done && <CheckIco />}
+                  </span>
+                  <span className={`flex-1 min-w-0 text-[13px] text-ink leading-snug ${done ? 'line-through opacity-50' : ''}`}>{ing.name}</span>
+                  {ing.qty && (
+                    <span className={`flex-shrink-0 max-w-[45%] text-right text-[12px] font-medium text-muted whitespace-nowrap truncate ${done ? 'opacity-50' : ''}`}>
+                      {ing.qty}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         ) : (
           <div className="mt-4 space-y-4">
