@@ -50,10 +50,15 @@ function normalizeSpoonacular(r: any): Recipe {
   const dishTypes: string[] = r.dishTypes ?? [];
   const calories = r.nutrition?.nutrients?.find((n: any) => n.name === 'Calories');
 
+  // Prefer the recipe's own ingredient list (in cooking order, with real
+  // measurements). nutrition.ingredients is Spoonacular's alphabetical
+  // nutrition breakdown, so it's only a last resort.
+  const filled = [...(r.usedIngredients ?? []), ...(r.missedIngredients ?? [])];
   const rawIngredients: any[] =
-    r.extendedIngredients ??
+    (r.extendedIngredients?.length ? r.extendedIngredients : null) ??
+    (filled.length ? filled : null) ??
     r.nutrition?.ingredients ??
-    [...(r.usedIngredients ?? []), ...(r.missedIngredients ?? [])];
+    [];
 
   const steps: string[] = (r.analyzedInstructions ?? [])
     .flatMap((block: any) => block.steps ?? [])
