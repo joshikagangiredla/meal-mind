@@ -1,8 +1,12 @@
-export default function StatusBar({ dark = false }: { dark?: boolean }) {
+/**
+ * Phone status bar. The app renders one pinned copy at the top of the frame
+ * (see App.tsx); screens use <StatusBarSpacer /> to leave room for it.
+ */
+export default function StatusBar({ dark = false, className = '' }: { dark?: boolean; className?: string }) {
   const col = dark ? 'text-white' : 'text-[#1E1E1E]';
   const fill = dark ? 'white' : '#1E1E1E';
   return (
-    <div className={`flex justify-between items-center px-6 pt-3 pb-1 text-[13px] font-semibold ${col}`}>
+    <div className={`flex justify-between items-center px-6 pt-3 pb-1 text-[13px] font-semibold transition-colors duration-200 ${col} ${className}`}>
       <span>9:46</span>
       <div className="flex gap-1.5 items-center">
         <svg width="16" height="11" viewBox="0 0 16 11" fill={fill}>
@@ -22,4 +26,9 @@ export default function StatusBar({ dark = false }: { dark?: boolean }) {
       </div>
     </div>
   );
+}
+
+/** Invisible copy that takes up exactly the status bar's height. */
+export function StatusBarSpacer() {
+  return <div aria-hidden className="invisible"><StatusBar /></div>;
 }

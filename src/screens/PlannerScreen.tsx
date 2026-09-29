@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { MealSlot, PlannerData, Recipe } from '../types';
 import { DAYS, DATES } from '../data/constants';
 import { recipeMeta } from '../api/recipes';
-import StatusBar from '../components/StatusBar';
+import { StatusBarSpacer } from '../components/StatusBar';
 import PageHeader from '../components/PageHeader';
 import { ChevronLIco, ChevronRIco, ClockIco, PlusIco } from '../components/icons';
 
@@ -24,7 +24,7 @@ export default function PlannerScreen({ plannerData, recipes, activeDay, onDayCh
 
   return (
     <div className="bg-cream min-h-full">
-      <StatusBar />
+      <StatusBarSpacer />
       <div className="px-6 pt-2 pb-32">
         <PageHeader title="My Meal Plan" />
 

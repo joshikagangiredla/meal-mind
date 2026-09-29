@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Category, Recipe } from '../types';
 import { CATEGORIES, POPULAR_TAGS } from '../data/constants';
 import { loadRecipes } from '../api/recipes';
-import StatusBar from '../components/StatusBar';
+import { StatusBarSpacer } from '../components/StatusBar';
 import PageHeader from '../components/PageHeader';
 import SourceNote from '../components/SourceNote';
 import { CardSkeleton, GridRecipeCard } from '../components/RecipeCards';
@@ -54,7 +54,7 @@ export default function SearchScreen({ initialCategory = null, onLoaded, onRecip
 
   return (
     <div className="bg-cream min-h-full">
-      <StatusBar />
+      <StatusBarSpacer />
       <div className="px-6 pt-2 pb-32">
         <PageHeader title="Search" />
 

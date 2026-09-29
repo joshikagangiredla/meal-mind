@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import type { Category, Recipe } from '../types';
 import { CATEGORIES, HERO_HEADLINES } from '../data/constants';
 import { recipeMeta } from '../api/recipes';
-import StatusBar from '../components/StatusBar';
 import Logo from '../components/Logo';
 import SourceNote from '../components/SourceNote';
 import { CardSkeleton, SmallRecipeCard } from '../components/RecipeCards';
@@ -46,9 +45,6 @@ export default function HomeScreen({ recipes, loading, error, source, onRetry, o
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/80" />
-        <div className="absolute top-0 left-0 right-0">
-          <StatusBar dark />
-        </div>
         <div className="absolute top-10 left-6">
           <Logo color="white" />
         </div>

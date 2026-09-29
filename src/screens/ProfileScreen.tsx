@@ -1,4 +1,4 @@
-import StatusBar from '../components/StatusBar';
+import { StatusBarSpacer } from '../components/StatusBar';
 import PageHeader from '../components/PageHeader';
 import { ChevronRIco } from '../components/icons';
 
@@ -13,7 +13,7 @@ export default function ProfileScreen({ savedCount, mealsPlanned }: { savedCount
 
   return (
     <div className="bg-[#FBF8F3] min-h-full">
-      <StatusBar />
+      <StatusBarSpacer />
       <div className="pb-32">
         {/* Profile header */}
         <div className="px-6 pt-3 pb-6">

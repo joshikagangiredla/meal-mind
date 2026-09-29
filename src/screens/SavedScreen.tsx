@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Category, Recipe } from '../types';
 import { CATEGORIES } from '../data/constants';
-import StatusBar from '../components/StatusBar';
+import { StatusBarSpacer } from '../components/StatusBar';
 import PageHeader from '../components/PageHeader';
 import { GridRecipeCard } from '../components/RecipeCards';
 
@@ -25,7 +25,7 @@ export default function SavedScreen({ recipes, savedIds, onToggleSave, onRecipe 
 
   return (
     <div className="bg-[#FBF8F3] min-h-full">
-      <StatusBar />
+      <StatusBarSpacer />
       <div className="px-6 pt-2 pb-32">
         <PageHeader title="Saved" />
 

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Category, MealSlot, NavTab, PlannerData, Recipe, Screen } from './types';
 import { loadRecipes } from './api/recipes';
 import BottomNav from './components/BottomNav';
+import StatusBar from './components/StatusBar';
 import AddMealSheet from './components/AddMealSheet';
 import HomeScreen from './screens/HomeScreen';
 import SearchScreen from './screens/SearchScreen';
@@ -51,7 +52,13 @@ export default function App() {
   const [sheet, setSheet] = useState<{ slot: MealSlot | null; highlightId: string | null } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const scrollTop = () => scrollRef.current?.scrollTo(0, 0);
+  const scrollTop = () => { scrollRef.current?.scrollTo(0, 0); setScrollY(0); };
+
+  // The status bar is pinned to the top. Over the Home/Detail photo it's
+  // transparent with white icons; past the photo it turns cream with dark icons.
+  const [scrollY, setScrollY] = useState(0);
+  const photoHeight = screen === 'home' ? 420 : screen === 'detail' ? 300 : 0;
+  const overPhoto = scrollY < photoHeight - 36;
 
   function openRecipe(id: string) {
     setSelectedRecipeId(id);
@@ -122,7 +129,7 @@ export default function App() {
     <div className="min-h-screen bg-[#E8E2DA] flex items-center justify-center">
       <div style={{ width: 390, height: 844, transform: `scale(${scale})`, transformOrigin: 'center center' }}>
         <div className="relative w-[390px] h-[844px] bg-cream overflow-hidden shadow-2xl rounded-[50px]">
-          <div ref={scrollRef} className="h-full overflow-y-auto scrollbar-hide">
+          <div ref={scrollRef} onScroll={e => setScrollY(e.currentTarget.scrollTop)} className="h-full overflow-y-auto scrollbar-hide">
             {screen === 'home' && (
               <HomeScreen
                 recipes={homeRecipes}
@@ -162,6 +169,11 @@ export default function App() {
             {screen === 'saved' && <SavedScreen recipes={cache} savedIds={savedIds} onToggleSave={toggleSave} onRecipe={openRecipe} />}
             {screen === 'profile' && <ProfileScreen savedCount={savedIds.size} mealsPlanned={mealsPlanned} />}
           </div>
+
+          <StatusBar
+            dark={overPhoto}
+            className={`absolute top-0 left-0 right-0 z-30 transition-[background-color] duration-200 ${overPhoto ? 'bg-transparent' : 'bg-cream/90 backdrop-blur-md'}`}
+          />
 
           {screen !== 'detail' && <BottomNav active={activeTab} onChange={handleTabChange} />}
 

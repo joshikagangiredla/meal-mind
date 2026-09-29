@@ -1,7 +1,6 @@
 import { Fragment, useState, type ReactNode } from 'react';
 import { capitalize } from '../api/recipes';
 import type { Recipe } from '../types';
-import StatusBar from '../components/StatusBar';
 import { BackIco, CheckIco, ClockIco, FlameIco, PersonsIco } from '../components/icons';
 
 export default function RecipeDetailScreen({ recipe, onBack, saved, onToggleSave, onAddToPlan }: {
@@ -38,9 +37,6 @@ export default function RecipeDetailScreen({ recipe, onBack, saved, onToggleSave
       <div className="relative w-full h-[300px] bg-gray-300">
         {recipe.photo && <img src={recipe.photo} alt={recipe.name} className="w-full h-full object-cover" />}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
-        <div className="absolute top-0 left-0 right-0">
-          <StatusBar dark />
-        </div>
         <div className="absolute top-10 left-5">
           <button onClick={onBack} aria-label="Back" className="w-9 h-9 bg-black/30 backdrop-blur-sm rounded-full flex items-center justify-center">
             <BackIco />
