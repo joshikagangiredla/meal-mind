@@ -118,7 +118,7 @@ export default function App() {
   useEffect(() => {
     function calcScale() {
       const s = Math.min(1, (window.innerWidth - 32) / 390, (window.innerHeight - 32) / 844);
-      setScale(Math.max(0.4, s));
+      setScale(Math.max(0.3, s));
     }
     calcScale();
     window.addEventListener('resize', calcScale);
@@ -126,8 +126,11 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#E8E2DA] flex items-center justify-center">
-      <div style={{ width: 390, height: 844, transform: `scale(${scale})`, transformOrigin: 'center center' }}>
+    // The page itself never scrolls: only the app's content scrolls inside the phone frame.
+    <div className="h-screen overflow-hidden bg-[#E8E2DA] flex items-center justify-center">
+      {/* Box sized to the *scaled* phone, so a shrunk frame doesn't leave phantom scroll space. */}
+      <div style={{ width: 390 * scale, height: 844 * scale }}>
+      <div style={{ width: 390, height: 844, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
         <div className="relative w-[390px] h-[844px] bg-cream overflow-hidden shadow-2xl rounded-[50px]">
           <div ref={scrollRef} onScroll={e => setScrollY(e.currentTarget.scrollTop)} className="h-full overflow-y-auto scrollbar-hide">
             {screen === 'home' && (
@@ -189,6 +192,7 @@ export default function App() {
             />
           )}
         </div>
+      </div>
       </div>
     </div>
   );
