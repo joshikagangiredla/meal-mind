@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import type { MealSlot, PlannerData } from '../types';
-import { DAYS, DATES, getRecipe } from '../data/recipes';
+import type { MealSlot, PlannerData, Recipe } from '../types';
+import { DAYS, DATES } from '../data/constants';
+import { recipeMeta } from '../api/recipes';
 import StatusBar from '../components/StatusBar';
 import PageHeader from '../components/PageHeader';
 import { ChevronLIco, ChevronRIco, ClockIco, PlusIco } from '../components/icons';
@@ -8,8 +9,9 @@ import { ChevronLIco, ChevronRIco, ClockIco, PlusIco } from '../components/icons
 const SLOTS: MealSlot[] = ['Breakfast', 'Lunch', 'Dinner'];
 const WEEK_LABELS: Record<number, string> = { [-1]: 'Sep 21 – Sep 27', 0: 'Sep 28 – Oct 4', 1: 'Oct 5 – Oct 11' };
 
-export default function PlannerScreen({ plannerData, activeDay, onDayChange, onAddMeal, onRemoveMeal, onOpen }: {
+export default function PlannerScreen({ plannerData, recipes, activeDay, onDayChange, onAddMeal, onRemoveMeal, onOpen }: {
   plannerData: PlannerData;
+  recipes: Record<string, Recipe>;
   activeDay: number;
   onDayChange: (day: number) => void;
   onAddMeal: (day: number, slot: MealSlot) => void;
@@ -59,7 +61,7 @@ export default function PlannerScreen({ plannerData, activeDay, onDayChange, onA
         {/* Meal slots */}
         {SLOTS.map(slot => {
           const recipeId = dayMeals[slot];
-          const recipe = recipeId ? getRecipe(recipeId) : null;
+          const recipe = recipeId ? recipes[recipeId] : null;
           return (
             <div key={slot} className="mb-4">
               <div className="flex items-center gap-2 mb-2">
@@ -72,7 +74,7 @@ export default function PlannerScreen({ plannerData, activeDay, onDayChange, onA
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] font-bold text-[#1E1E1E] leading-tight">{recipe.name}</p>
                     <div className="flex items-center gap-1 mt-1 text-[#6B6B6B]">
-                      <ClockIco /><span className="text-[11px]">{recipe.time}</span>
+                      {recipe.time && <ClockIco />}<span className="text-[11px] truncate">{recipe.time ?? recipeMeta(recipe)}</span>
                     </div>
                   </div>
                   <button

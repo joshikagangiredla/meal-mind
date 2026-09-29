@@ -1,16 +1,27 @@
 import { useState } from 'react';
-import { RECIPES } from '../data/recipes';
+import type { Category, Recipe } from '../types';
+import { CATEGORIES } from '../data/constants';
 import StatusBar from '../components/StatusBar';
 import PageHeader from '../components/PageHeader';
 import { GridRecipeCard } from '../components/RecipeCards';
 
-export default function SavedScreen({ savedIds, onToggleSave, onRecipe }: {
+/** Does a recipe belong to a Home/Search category? Works for both APIs. */
+function matches(r: Recipe, c: Category) {
+  const wanted = [c.value, c.mealdb?.c, c.mealdb?.a].filter(Boolean).map(v => v!.toLowerCase());
+  return r.tags.some(t => wanted.includes(t));
+}
+
+export default function SavedScreen({ recipes, savedIds, onToggleSave, onRecipe }: {
+  recipes: Record<string, Recipe>;
   savedIds: Set<string>; onToggleSave: (id: string) => void; onRecipe: (id: string) => void;
 }) {
   const [activeFilter, setActiveFilter] = useState('All');
-  const cats = ['All', 'Breakfast', 'Asian', 'Quick Meals', 'Vegetarian', 'Desserts'];
-  const saved = RECIPES.filter(r => savedIds.has(r.id));
-  const filtered = activeFilter === 'All' ? saved : saved.filter(r => r.category === activeFilter);
+  const saved = [...savedIds].map(id => recipes[id]).filter(Boolean);
+  // Only offer filters that match at least one saved recipe.
+  const cats = ['All', ...CATEGORIES.filter(c => saved.some(r => matches(r, c))).map(c => c.label)];
+  const current = cats.includes(activeFilter) ? activeFilter : 'All';
+  const category = CATEGORIES.find(c => c.label === current);
+  const filtered = category ? saved.filter(r => matches(r, category)) : saved;
 
   return (
     <div className="bg-[#FBF8F3] min-h-full">
@@ -24,7 +35,7 @@ export default function SavedScreen({ savedIds, onToggleSave, onRecipe }: {
             <button
               key={c}
               onClick={() => setActiveFilter(c)}
-              className={`flex-shrink-0 px-4 py-1.5 rounded-full text-[12px] font-medium border transition-all ${activeFilter === c ? 'bg-[#4A5D3F] text-white border-[#4A5D3F]' : 'bg-white text-[#6B6B6B] border-[#E5E0D8]'}`}
+              className={`flex-shrink-0 px-4 py-1.5 rounded-full text-[12px] font-medium border transition-all ${current === c ? 'bg-[#4A5D3F] text-white border-[#4A5D3F]' : 'bg-white text-[#6B6B6B] border-[#E5E0D8]'}`}
             >
               {c}
             </button>

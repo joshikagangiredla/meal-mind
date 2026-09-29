@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import type { MealSlot, NavTab, PlannerData, Screen } from './types';
-import { getRecipe } from './data/recipes';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { Category, MealSlot, NavTab, PlannerData, Recipe, Screen } from './types';
+import { loadRecipes } from './api/recipes';
 import BottomNav from './components/BottomNav';
 import AddMealSheet from './components/AddMealSheet';
 import HomeScreen from './screens/HomeScreen';
@@ -16,13 +16,37 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [screen, setScreen] = useState<Screen>('home');
   const [selectedRecipeId, setSelectedRecipeId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [savedIds, setSavedIds] = useState<Set<string>>(new Set(['1', '3', '5', '7']));
-  const [plannerData, setPlannerData] = useState<PlannerData>({
-    1: { Breakfast: '2', Lunch: '4' },
-    2: { Dinner: '1' },
-    4: { Lunch: '5', Dinner: '3' },
-  });
+  const [searchCategory, setSearchCategory] = useState<Category | null>(null);
+  const [searchKey, setSearchKey] = useState(0);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [plannerData, setPlannerData] = useState<PlannerData>({});
+
+  // Every recipe the app has loaded, by id, so Saved/Planner/Detail can find them.
+  const [cache, setCache] = useState<Record<string, Recipe>>({});
+  const remember = useCallback((list: Recipe[]) => {
+    setCache(prev => {
+      const next = { ...prev };
+      for (const r of list) next[r.id] = r;
+      return next;
+    });
+  }, []);
+
+  // Home feed: new recipes every time the app opens.
+  const [homeIds, setHomeIds] = useState<string[]>([]);
+  const [homeSource, setHomeSource] = useState<'spoonacular' | 'mealdb' | null>(null);
+  const [homeStatus, setHomeStatus] = useState<'loading' | 'done' | 'error'>('loading');
+  const loadHome = useCallback(() => {
+    setHomeStatus('loading');
+    loadRecipes({ number: 10 })
+      .then(res => {
+        remember(res.recipes);
+        setHomeIds(res.recipes.map(r => r.id));
+        setHomeSource(res.source);
+        setHomeStatus('done');
+      })
+      .catch(() => setHomeStatus('error'));
+  }, [remember]);
+  useEffect(loadHome, [loadHome]);
   const [plannerDay, setPlannerDay] = useState(TODAY);
   const [sheet, setSheet] = useState<{ slot: MealSlot | null; highlightId: string | null } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -41,14 +65,15 @@ export default function App() {
   }
 
   function handleTabChange(tab: NavTab) {
-    if (tab === 'search' && activeTab !== 'search') setSearchQuery('');
+    if (tab === 'search' && activeTab !== 'search') { setSearchCategory(null); setSearchKey(k => k + 1); }
     setActiveTab(tab);
     setScreen(tab);
     scrollTop();
   }
 
-  function openCategory(name: string) {
-    setSearchQuery(name);
+  function openCategory(c: Category) {
+    setSearchCategory(c);
+    setSearchKey(k => k + 1);
     setActiveTab('search');
     setScreen('search');
     scrollTop();
@@ -78,7 +103,8 @@ export default function App() {
   }
 
   const mealsPlanned = Object.values(plannerData).reduce((n, d) => n + Object.keys(d || {}).length, 0);
-  const selectedRecipe = selectedRecipeId ? getRecipe(selectedRecipeId) : null;
+  const selectedRecipe = selectedRecipeId ? cache[selectedRecipeId] : null;
+  const homeRecipes = homeIds.map(id => cache[id]).filter(Boolean);
 
   // Scale the 390×844 phone frame to fit smaller windows.
   const [scale, setScale] = useState(1);
@@ -98,10 +124,20 @@ export default function App() {
         <div className="relative w-[390px] h-[844px] bg-cream overflow-hidden shadow-2xl rounded-[50px]">
           <div ref={scrollRef} className="h-full overflow-y-auto scrollbar-hide">
             {screen === 'home' && (
-              <HomeScreen onRecipe={openRecipe} onCategory={openCategory} savedIds={savedIds} onToggleSave={toggleSave} />
+              <HomeScreen
+                recipes={homeRecipes}
+                loading={homeStatus === 'loading'}
+                error={homeStatus === 'error'}
+                source={homeSource}
+                onRetry={loadHome}
+                onRecipe={openRecipe}
+                onCategory={openCategory}
+                savedIds={savedIds}
+                onToggleSave={toggleSave}
+              />
             )}
             {screen === 'search' && (
-              <SearchScreen key={searchQuery} initialQuery={searchQuery} onRecipe={openRecipe} savedIds={savedIds} onToggleSave={toggleSave} />
+              <SearchScreen key={searchKey} initialCategory={searchCategory} onLoaded={remember} onRecipe={openRecipe} savedIds={savedIds} onToggleSave={toggleSave} />
             )}
             {screen === 'detail' && selectedRecipe && (
               <RecipeDetailScreen
@@ -115,6 +151,7 @@ export default function App() {
             {screen === 'planner' && (
               <PlannerScreen
                 plannerData={plannerData}
+                recipes={cache}
                 activeDay={plannerDay}
                 onDayChange={setPlannerDay}
                 onAddMeal={(_, slot) => setSheet({ slot, highlightId: null })}
@@ -122,7 +159,7 @@ export default function App() {
                 onOpen={openRecipe}
               />
             )}
-            {screen === 'saved' && <SavedScreen savedIds={savedIds} onToggleSave={toggleSave} onRecipe={openRecipe} />}
+            {screen === 'saved' && <SavedScreen recipes={cache} savedIds={savedIds} onToggleSave={toggleSave} onRecipe={openRecipe} />}
             {screen === 'profile' && <ProfileScreen savedCount={savedIds.size} mealsPlanned={mealsPlanned} />}
           </div>
 
@@ -133,6 +170,8 @@ export default function App() {
               day={plannerDay}
               slot={sheet.slot}
               highlightId={sheet.highlightId}
+              recipes={Object.values(cache)}
+              onLoaded={remember}
               onClose={() => setSheet(null)}
               onAdd={(recipeId, slot) => setMeal(plannerDay, slot, recipeId)}
             />
