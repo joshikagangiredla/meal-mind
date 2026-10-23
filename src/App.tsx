@@ -10,7 +10,7 @@ import AddMealSheet from './components/AddMealSheet';
 import GroceryListSheet from './components/GroceryListSheet';
 import HomeScreen from './screens/HomeScreen';
 import SearchScreen from './screens/SearchScreen';
-import RecipeDetailScreen from './screens/RecipeDetailScreen';
+import RecipeDetailScreen, { AddToPlanBar } from './screens/RecipeDetailScreen';
 import PlannerScreen from './screens/PlannerScreen';
 import SavedScreen from './screens/SavedScreen';
 import ProfileScreen from './screens/ProfileScreen';
@@ -228,7 +228,8 @@ export default function App() {
 
   return (
     // The page itself never scrolls: only the app's content scrolls inside the phone frame.
-    <div className="h-screen overflow-hidden bg-[#E8E2DA] flex items-center justify-center">
+    // 100dvh = the visible screen on phones (100vh runs behind Safari's toolbar); h-screen is the fallback.
+    <div className="h-screen overflow-hidden bg-[#E8E2DA] flex items-center justify-center" style={{ height: '100dvh' }}>
       {/* Box sized to the *scaled* phone, so a shrunk frame doesn't leave phantom scroll space. */}
       <div style={{ width: 390 * scale, height: 844 * scale }}>
       <div style={{ width: 390, height: 844, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
@@ -257,7 +258,6 @@ export default function App() {
                 onBack={goBack}
                 saved={savedIds.has(selectedRecipe.id)}
                 onToggleSave={() => toggleSave(selectedRecipe.id)}
-                onAddToPlan={handleAddToPlan}
               />
             )}
             {screen === 'planner' && (
@@ -296,6 +296,7 @@ export default function App() {
           />
 
           {screen !== 'detail' && <BottomNav active={activeTab} onChange={handleTabChange} />}
+          {screen === 'detail' && selectedRecipe && <AddToPlanBar onAddToPlan={handleAddToPlan} />}
 
           {sheet && (
             <AddMealSheet

@@ -3,9 +3,9 @@ import { capitalize } from '../api/recipes';
 import type { Recipe } from '../types';
 import { BackIco, CheckIco, ClockIco, FlameIco, PersonsIco } from '../components/icons';
 
-export default function RecipeDetailScreen({ recipe, status = 'idle', onBack, saved, onToggleSave, onAddToPlan }: {
+export default function RecipeDetailScreen({ recipe, status = 'idle', onBack, saved, onToggleSave }: {
   recipe: Recipe; status?: 'idle' | 'loading' | 'error'; onBack: () => void; saved: boolean;
-  onToggleSave: () => void; onAddToPlan: () => void;
+  onToggleSave: () => void;
 }) {
   const [tab, setTab] = useState<'ingredients' | 'instructions'>('ingredients');
   const [checked, setChecked] = useState<Set<number>>(new Set());
@@ -149,15 +149,26 @@ export default function RecipeDetailScreen({ recipe, status = 'idle', onBack, sa
         </>)}
       </div>
 
-      {/* Sticky add button (pinned to the phone frame, not the scroll area) */}
-      <div className="sticky bottom-0 left-0 right-0 px-6 pb-8 pt-4 bg-gradient-to-t from-cream via-cream/90 to-transparent">
-        <button
-          onClick={onAddToPlan}
-          className="w-full bg-olive text-white text-[15px] font-bold py-4 rounded-full shadow-lg active:scale-[0.98] transition-transform"
-        >
-          Add to Meal Plan
-        </button>
-      </div>
+      {/* Room so the last ingredient isn't hidden under the pinned button. */}
+      <div className="h-28" />
+    </div>
+  );
+}
+
+/**
+ * "Add to Meal Plan" bar. App renders this outside the scroll area, pinned to the
+ * bottom of the phone frame. (position: sticky inside the scaled frame drifted to
+ * the middle of the screen on iPhone Safari.)
+ */
+export function AddToPlanBar({ onAddToPlan }: { onAddToPlan: () => void }) {
+  return (
+    <div className="absolute bottom-0 left-0 right-0 z-20 px-6 pb-8 pt-6 bg-gradient-to-t from-cream via-cream/90 to-transparent">
+      <button
+        onClick={onAddToPlan}
+        className="w-full bg-olive text-white text-[15px] font-bold py-4 rounded-full shadow-lg active:scale-[0.98] transition-transform"
+      >
+        Add to Meal Plan
+      </button>
     </div>
   );
 }
